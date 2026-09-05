@@ -8,7 +8,7 @@ jobs:
     name: Build and run tests in Release mode
     strategy:
       matrix:
-        os: [ ubuntu-24.04 ]
+        os: [ ubuntu-24.04, ubuntu-26.04 ]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Install dependencies
