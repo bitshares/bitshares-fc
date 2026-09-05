@@ -8,6 +8,7 @@
 
 #include <fc/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/enum.hpp>
 #include <boost/preprocessor/seq/size.hpp>
