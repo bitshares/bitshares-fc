@@ -3,6 +3,7 @@ on: [ push, pull_request ]
 env:
   CCACHE_COMPRESS: exists means true
   CCACHE_SLOPPINESS: include_file_ctime,include_file_mtime,time_macros
+  CMAKE_POLICY_VERSION_MINIMUM: 3.5
 jobs:
   test-release:
     name: Build and run tests in Release mode
