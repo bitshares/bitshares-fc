@@ -56,6 +56,9 @@ namespace  fc
           CRYPTO_cleanup_all_ex_data();
           ERR_free_strings();
        }
+
+       openssl_scope(openssl_scope&) = delete;
+       openssl_scope(openssl_scope&&) = delete;
     };
 
     void store_configuration_path(const path& filePath)
