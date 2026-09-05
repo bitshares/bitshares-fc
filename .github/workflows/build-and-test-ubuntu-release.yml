@@ -8,16 +8,12 @@ jobs:
     name: Build and run tests in Release mode
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-24.04 ]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        openssl_ver=`sudo apt-cache madison openssl | grep xenial-updates | awk '{print $3}'`
-        libssl_ver=`sudo apt-cache madison libssl-dev | grep xenial-updates | awk '{print $3}'`
-        [ -n "${openssl_ver}" ] && [ -n "${libssl_ver}" ] && \
-          sudo apt-get install -y --allow-downgrades openssl=${openssl_ver} libssl-dev=${libssl_ver}
         sudo apt-get install -y \
                      ccache \
                      parallel \
@@ -31,8 +27,11 @@ jobs:
                      libboost-test-dev \
                      libboost-context-dev \
                      libboost-regex-dev \
+                     libzstd-dev \
+                     libbz2-dev \
+                     liblzma-dev \
                      libboost-coroutine-dev
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     - name: Configure
@@ -49,7 +48,7 @@ jobs:
               ..
         popd
     - name: Load Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       with:
         path: ccache
         key: ccache-release-${{ matrix.os }}-${{ github.ref }}-${{ github.sha }}
@@ -64,7 +63,7 @@ jobs:
     - name: Test
       run: |
         parallel echo Running {}\; sh -c "./{}" <<_EOT_
-        tests/run-parallel-tests.sh _build/tests/all_tests -l test_suite
+        tests/run-parallel-tests.sh _build/tests/all_tests -l message
         _build/tests/bloom_test -- README.md
         _build/tests/ecc_test README.md
         _build/tests/hmac_test

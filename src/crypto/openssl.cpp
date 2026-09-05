@@ -46,13 +46,19 @@ namespace  fc
 #if not defined(LIBRESSL_VERSION_NUMBER)
           // No FIPS in LibreSSL.
           // https://marc.info/?l=openbsd-misc&m=139819485423701&w=2
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+          // FIPS_mode_set() is removed in OpenSSL v3
           FIPS_mode_set(0);
+#endif
 #endif
           CONF_modules_unload(1);
           EVP_cleanup();
           CRYPTO_cleanup_all_ex_data();
           ERR_free_strings();
        }
+
+       openssl_scope(openssl_scope&) = delete;
+       openssl_scope(openssl_scope&&) = delete;
     };
 
     void store_configuration_path(const path& filePath)
