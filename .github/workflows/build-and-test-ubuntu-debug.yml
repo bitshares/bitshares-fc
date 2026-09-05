@@ -31,7 +31,7 @@ jobs:
                      libbz2-dev \
                      liblzma-dev \
                      libboost-coroutine-dev
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     - name: Configure
@@ -48,7 +48,7 @@ jobs:
               ..
         popd
     - name: Load Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       with:
         path: ccache
         key: ccache-debug-${{ matrix.os }}-${{ github.ref }}-${{ github.sha }}
