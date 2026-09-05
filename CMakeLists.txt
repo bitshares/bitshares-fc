@@ -212,7 +212,6 @@ set( fc_sources
      src/crypto/sha256.cpp
      src/crypto/sha224.cpp
      src/crypto/sha512.cpp
-     src/crypto/dh.cpp
      src/crypto/elliptic_common.cpp
      src/crypto/elliptic_impl_priv.cpp
      src/crypto/elliptic_secp256k1.cpp
