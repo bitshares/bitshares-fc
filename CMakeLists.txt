@@ -39,7 +39,9 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 SET(BOOST_COMPONENTS)
-LIST(APPEND BOOST_COMPONENTS coroutine thread date_time filesystem system program_options chrono unit_test_framework context iostreams regex)
+# NOTE: boost_system is header-only since 1.69; its compiled stub (and
+#       CMake config) were removed in Boost 1.89, so it must not be requested.
+LIST(APPEND BOOST_COMPONENTS coroutine thread date_time filesystem program_options chrono unit_test_framework context iostreams regex)
 # boost::endian is also required, but FindBoost can't handle header-only libs
 SET( Boost_USE_STATIC_LIBS ON CACHE STRING "ON or OFF" )
 
