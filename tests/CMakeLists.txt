@@ -43,6 +43,7 @@ add_executable( all_tests all_tests.cpp
                           io/tcp_test.cpp
                           io/varint_tests.cpp
                           network/ip_tests.cpp
+                          network/tcp_tests.cpp
                           network/http/websocket_test.cpp
                           thread/task_cancel.cpp
                           thread/thread_tests.cpp
