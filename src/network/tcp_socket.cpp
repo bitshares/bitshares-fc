@@ -20,11 +20,6 @@
 
 namespace fc {
 
-  namespace detail
-  {
-    bool have_so_reuseport = true;
-  }
-
   class tcp_socket::impl : public tcp_socket_io_hooks {
     public:
       impl() :
@@ -244,25 +239,10 @@ namespace fc {
     FC_ASSERT(my->_sock.is_open());
     boost::asio::socket_base::reuse_address option(enable);
     my->_sock.set_option(option);
-#if defined(__APPLE__) || defined(__linux__)
-# ifndef SO_REUSEPORT
-#  define SO_REUSEPORT 15
-# endif
-    // OSX needs SO_REUSEPORT in addition to SO_REUSEADDR.
-    // This probably needs to be set for any BSD
-    if (detail::have_so_reuseport)
-    {
-      int reuseport_value = 1;
-      if (setsockopt(my->_sock.native_handle(), SOL_SOCKET, SO_REUSEPORT,
-                     (char*)&reuseport_value, sizeof(reuseport_value)) < 0)
-      {
-        if (errno == ENOPROTOOPT)
-          detail::have_so_reuseport = false;
-        else
-          wlog("Error setting SO_REUSEPORT");
-      }
-    }
-#endif // __APPLE__
+    // Note:
+    //   There was old code here that tried to set SO_REUSEPORT as well, but it has been removed,
+    //   because it is not necessary at least in BitShares.
+    //   If we really need it, we can add a new function to set it.
   }
 
 
@@ -312,24 +292,31 @@ namespace fc {
   {
     if( !my ) 
       my = new impl;
+#if defined _WIN32 || defined WIN32 || defined OS_WIN64 || defined _WIN64 || defined WIN64 || defined WINNT
+    // https://learn.microsoft.com/en-us/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse
+    BOOL enabled = enable ? TRUE : FALSE;
+    if( ::setsockopt(
+          my->_accept.native_handle(),
+          SOL_SOCKET,
+          SO_EXCLUSIVEADDRUSE,
+          reinterpret_cast<const char*>(&enabled),
+          sizeof(enabled)) == SOCKET_ERROR ) {
+      throw boost::system::system_error(
+              boost::system::error_code(
+                ::WSAGetLastError(),
+                boost::asio::error::get_system_category()));
+    }
+#else
     boost::asio::ip::tcp::acceptor::reuse_address option(enable);
     my->_accept.set_option(option);
-#if defined(__APPLE__) || (defined(__linux__) && defined(SO_REUSEPORT))
-    // OSX needs SO_REUSEPORT in addition to SO_REUSEADDR.
-    // This probably needs to be set for any BSD
-    if (detail::have_so_reuseport)
-    {
-      int reuseport_value = 1;
-      if (setsockopt(my->_accept.native_handle(), SOL_SOCKET, SO_REUSEPORT,
-                     (char*)&reuseport_value, sizeof(reuseport_value)) < 0)
-      {
-        if (errno == ENOPROTOOPT)
-          detail::have_so_reuseport = false;
-        else
-          wlog("Error setting SO_REUSEPORT");
-      }
-    }
-#endif // __APPLE__
+    // Note:
+    //   There was old code here that tried to set SO_REUSEPORT as well, but it has been removed.
+    //   If we really need it, we can add a new function to set it.
+    //   SO_REUSEPORT allows multiple processes to bind to and listen on the same port - at least
+    //   this behavior is unwanted in BitShares.
+    //   BTW for Solaris perhaps we need to set SO_EXCLBIND.
+    //   See https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ
+#endif
   }
   void tcp_server::listen( uint16_t port ) 
   {
