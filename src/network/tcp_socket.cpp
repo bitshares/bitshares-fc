@@ -268,7 +268,15 @@ namespace fc {
   };
   void tcp_server::close() {
     if( my && my->_accept.is_open() ) 
-      my->_accept.close();
+    {
+        try {
+          my->_accept.close();
+        }
+        catch ( boost::system::system_error& )
+        {
+           wlog( "unexpected exception ${e}", ("e", fc::except_str()) );
+        }
+    }
     delete my;
     my = nullptr;
   }
