@@ -18,9 +18,8 @@ jobs:
       uses: actions/cache/restore@v6
       with:
         path: ccache
-        key: ccache-${{ matrix.build-type }}-${{ matrix.os }}-${{ github.ref }}-${{ github.sha }}
+        key: ccache-${{ matrix.build-type }}-${{ matrix.os }}-${{ github.ref }}
         restore-keys: |
-          ccache-${{ matrix.build-type }}-${{ matrix.os }}-${{ github.ref }}-
           ccache-${{ matrix.build-type }}-${{ matrix.os }}-
 
   keepalive:
