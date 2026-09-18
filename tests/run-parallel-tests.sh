@@ -42,5 +42,5 @@ else
       if [ -n "$pre" -a "$found" = "0" ]; then
         echo "$pre"
       fi) \
-    | parallel echo Running {}\; "$@" -t {}
+    | parallel --tag --halt soon,fail=1 "$@" -t {}
 fi

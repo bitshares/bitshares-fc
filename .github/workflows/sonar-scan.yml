@@ -89,7 +89,7 @@ jobs:
         build-wrapper-linux-x86-64 --out-dir bw-output make -j 2 -C _build
     - name: Test
       run: |
-        parallel echo Running {}\; sh -c "./{}" <<_EOT_
+        parallel --tag --halt soon,fail=1 sh -c "./{}" <<_EOT_
         tests/run-parallel-tests.sh _build/tests/all_tests -l test_suite
         _build/tests/bloom_test -- README.md
         _build/tests/ecc_test README.md
